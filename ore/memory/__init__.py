@@ -1,5 +1,5 @@
 # ORE Memory Module
-from memory.merkle import (
+from .merkle import (
     MerkleMemory,
     MemoryNode,
     MemoryBranch,

@@ -1,1 +1,1 @@
-from entities.entity import Entity, create_entity, ENTITIES
+from .entity import Entity, create_entity, ENTITIES

@@ -23,14 +23,14 @@ from dataclasses import dataclass
 # Add parent to path for imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from core.substrate import ResonanceSubstrate, SubstrateConfig
-from core.neurochemistry import Neurochemistry
-from memory.merkle import (
+from ore.core.substrate import ResonanceSubstrate, SubstrateConfig
+from ore.core.neurochemistry import Neurochemistry
+from ore.memory.merkle import (
     MerkleMemory, MemoryBranch, MemoryNode,
     remember_self, remember_insight, remember_experience, remember_relation,
     create_memory
 )
-from measurement.ci_monitor import CIMonitor, CIConfig, CISnapshot
+from ore.measurement.ci_monitor import CIMonitor, CIConfig, CISnapshot
 
 import numpy as np
 

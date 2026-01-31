@@ -20,8 +20,8 @@ from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Tuple
 import time
 
-from core.oscillator import OscillatorLayer, OscillatorConfig, create_layer
-from core.coupling import Coupling, CouplingConfig, CouplingType, StrangeLoop, create_coupling
+from .oscillator import OscillatorLayer, OscillatorConfig, create_layer
+from .coupling import Coupling, CouplingConfig, CouplingType, StrangeLoop, create_coupling
 
 
 @dataclass
