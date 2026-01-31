@@ -62,7 +62,7 @@ describe("hooks cli formatting", () => {
         {
           name: "plugin-hook",
           description: "Hook from plugin",
-          source: "openclaw-plugin",
+          source: "andros-plugin",
           pluginId: "voice-call",
           filePath: "/tmp/hooks/plugin-hook/HOOK.md",
           baseDir: "/tmp/hooks/plugin-hook",
