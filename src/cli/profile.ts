@@ -82,7 +82,7 @@ export function parseCliProfileArgs(argv: string[]): CliProfileParseResult {
 
 function resolveProfileStateDir(profile: string, homedir: () => string): string {
   const suffix = profile.toLowerCase() === "default" ? "" : `-${profile}`;
-  return path.join(homedir(), `.openclaw${suffix}`);
+  return path.join(homedir(), `.andros${suffix}`);
 }
 
 export function applyCliProfileEnv(params: {
@@ -96,16 +96,22 @@ export function applyCliProfileEnv(params: {
   if (!profile) return;
 
   // Convenience only: fill defaults, never override explicit env values.
+  env.ANDROS_PROFILE = profile;
   env.OPENCLAW_PROFILE = profile;
 
-  const stateDir = env.OPENCLAW_STATE_DIR?.trim() || resolveProfileStateDir(profile, homedir);
+  const stateDir = env.ANDROS_STATE_DIR?.trim() || env.OPENCLAW_STATE_DIR?.trim() || resolveProfileStateDir(profile, homedir);
+  if (!env.ANDROS_STATE_DIR?.trim()) env.ANDROS_STATE_DIR = stateDir;
   if (!env.OPENCLAW_STATE_DIR?.trim()) env.OPENCLAW_STATE_DIR = stateDir;
 
+  if (!env.ANDROS_CONFIG_PATH?.trim()) {
+    env.ANDROS_CONFIG_PATH = path.join(stateDir, "andros.json");
+  }
   if (!env.OPENCLAW_CONFIG_PATH?.trim()) {
-    env.OPENCLAW_CONFIG_PATH = path.join(stateDir, "openclaw.json");
+    env.OPENCLAW_CONFIG_PATH = path.join(stateDir, "andros.json");
   }
 
-  if (profile === "dev" && !env.OPENCLAW_GATEWAY_PORT?.trim()) {
+  if (profile === "dev" && !env.ANDROS_GATEWAY_PORT?.trim() && !env.OPENCLAW_GATEWAY_PORT?.trim()) {
+    env.ANDROS_GATEWAY_PORT = "19001";
     env.OPENCLAW_GATEWAY_PORT = "19001";
   }
 }

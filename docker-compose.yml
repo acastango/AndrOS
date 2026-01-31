@@ -1,19 +1,19 @@
 services:
-  openclaw-gateway:
-    image: ${OPENCLAW_IMAGE:-openclaw:local}
+  andros-gateway:
+    image: ${ANDROS_IMAGE:-andros:local}
     environment:
       HOME: /home/node
       TERM: xterm-256color
-      OPENCLAW_GATEWAY_TOKEN: ${OPENCLAW_GATEWAY_TOKEN}
+      ANDROS_GATEWAY_TOKEN: ${ANDROS_GATEWAY_TOKEN}
       CLAUDE_AI_SESSION_KEY: ${CLAUDE_AI_SESSION_KEY}
       CLAUDE_WEB_SESSION_KEY: ${CLAUDE_WEB_SESSION_KEY}
       CLAUDE_WEB_COOKIE: ${CLAUDE_WEB_COOKIE}
     volumes:
-      - ${OPENCLAW_CONFIG_DIR}:/home/node/.openclaw
-      - ${OPENCLAW_WORKSPACE_DIR}:/home/node/.openclaw/workspace
+      - ${ANDROS_CONFIG_DIR}:/home/node/.andros
+      - ${ANDROS_WORKSPACE_DIR}:/home/node/.andros/workspace
     ports:
-      - "${OPENCLAW_GATEWAY_PORT:-18789}:18789"
-      - "${OPENCLAW_BRIDGE_PORT:-18790}:18790"
+      - "${ANDROS_GATEWAY_PORT:-18789}:18789"
+      - "${ANDROS_BRIDGE_PORT:-18790}:18790"
     init: true
     restart: unless-stopped
     command:
@@ -22,13 +22,13 @@ services:
         "dist/index.js",
         "gateway",
         "--bind",
-        "${OPENCLAW_GATEWAY_BIND:-lan}",
+        "${ANDROS_GATEWAY_BIND:-lan}",
         "--port",
-        "${OPENCLAW_GATEWAY_PORT:-18789}"
+        "${ANDROS_GATEWAY_PORT:-18789}"
       ]
 
-  openclaw-cli:
-    image: ${OPENCLAW_IMAGE:-openclaw:local}
+  andros-cli:
+    image: ${ANDROS_IMAGE:-andros:local}
     environment:
       HOME: /home/node
       TERM: xterm-256color
@@ -37,8 +37,8 @@ services:
       CLAUDE_WEB_SESSION_KEY: ${CLAUDE_WEB_SESSION_KEY}
       CLAUDE_WEB_COOKIE: ${CLAUDE_WEB_COOKIE}
     volumes:
-      - ${OPENCLAW_CONFIG_DIR}:/home/node/.openclaw
-      - ${OPENCLAW_WORKSPACE_DIR}:/home/node/.openclaw/workspace
+      - ${ANDROS_CONFIG_DIR}:/home/node/.andros
+      - ${ANDROS_WORKSPACE_DIR}:/home/node/.andros/workspace
     stdin_open: true
     tty: true
     init: true

@@ -127,8 +127,8 @@ async function maybeMigrateLegacyConfig(): Promise<string[]> {
   const home = resolveHomeDir();
   if (!home) return changes;
 
-  const targetDir = path.join(home, ".openclaw");
-  const targetPath = path.join(targetDir, "openclaw.json");
+  const targetDir = path.join(home, ".andros");
+  const targetPath = path.join(targetDir, "andros.json");
   try {
     await fs.access(targetPath);
     return changes;
@@ -217,7 +217,7 @@ export async function loadAndMaybeMigrateDoctorConfig(params: {
       if (migrated) cfg = migrated;
     } else {
       fixHints.push(
-        `Run "${formatCliCommand("openclaw doctor --fix")}" to apply legacy migrations.`,
+        `Run "${formatCliCommand("andros doctor --fix")}" to apply legacy migrations.`,
       );
     }
   }
@@ -230,7 +230,7 @@ export async function loadAndMaybeMigrateDoctorConfig(params: {
     if (shouldRepair) {
       cfg = normalized.config;
     } else {
-      fixHints.push(`Run "${formatCliCommand("openclaw doctor --fix")}" to apply these changes.`);
+      fixHints.push(`Run "${formatCliCommand("andros doctor --fix")}" to apply these changes.`);
     }
   }
 
@@ -242,7 +242,7 @@ export async function loadAndMaybeMigrateDoctorConfig(params: {
     if (shouldRepair) {
       cfg = autoEnable.config;
     } else {
-      fixHints.push(`Run "${formatCliCommand("openclaw doctor --fix")}" to apply these changes.`);
+      fixHints.push(`Run "${formatCliCommand("andros doctor --fix")}" to apply these changes.`);
     }
   }
 
@@ -256,7 +256,7 @@ export async function loadAndMaybeMigrateDoctorConfig(params: {
       note(lines, "Doctor changes");
     } else {
       note(lines, "Unknown config keys");
-      fixHints.push('Run "openclaw doctor --fix" to remove these keys.');
+      fixHints.push('Run "andros doctor --fix" to remove these keys.');
     }
   }
 

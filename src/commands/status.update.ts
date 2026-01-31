@@ -1,4 +1,4 @@
-import { resolveOpenClawPackageRoot } from "../infra/openclaw-root.js";
+import { resolveOpenClawPackageRoot } from "../infra/andros-root.js";
 import {
   checkUpdateStatus,
   compareSemverStrings,

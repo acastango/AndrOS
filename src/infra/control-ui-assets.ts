@@ -3,7 +3,7 @@ import path from "node:path";
 
 import { runCommandWithTimeout } from "../process/exec.js";
 import { defaultRuntime, type RuntimeEnv } from "../runtime.js";
-import { resolveOpenClawPackageRoot } from "./openclaw-root.js";
+import { resolveOpenClawPackageRoot } from "./andros-root.js";
 
 export function resolveControlUiRepoRoot(
   argv1: string | undefined = process.argv[1],
