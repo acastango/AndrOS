@@ -8,9 +8,13 @@
  */
 
 import { spawn, type ChildProcess } from "node:child_process";
-import { resolve as pathResolve } from "node:path";
+import { resolve as pathResolve, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
 import { existsSync } from "node:fs";
 import { getOREClient } from "./client.js";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const DEFAULT_PORT = 9780;
 const STARTUP_TIMEOUT_MS = 15_000;
