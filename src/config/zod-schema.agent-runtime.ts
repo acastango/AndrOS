@@ -446,6 +446,18 @@ export const AgentEntrySchema = z
       .optional(),
     sandbox: AgentSandboxSchema,
     tools: AgentToolsSchema,
+    substrate: z
+      .object({
+        enabled: z.boolean().optional(),
+        entityName: z.string().optional(),
+        identityHash: z.string().optional(),
+        frequencyOffset: z.number().optional(),
+        tickInterval: z.number().optional(),
+        description: z.string().optional(),
+        foundingMemories: z.array(z.string()).optional(),
+      })
+      .strict()
+      .optional(),
   })
   .strict();
 
