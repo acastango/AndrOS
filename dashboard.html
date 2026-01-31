@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ORE Dashboard</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Consolas', 'Monaco', monospace;
+            background: #0a0a0a;
+            color: #00ff88;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #00ffcc;
+            text-shadow: 0 0 20px #00ffcc44;
+        }
+        
+        .connection-status {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        
+        .connected { background: #00ff8822; border: 1px solid #00ff88; }
+        .disconnected { background: #ff000022; border: 1px solid #ff0000; color: #ff0000; }
+        
+        .entities-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+        }
+        
+        .entity-card {
+            background: #111;
+            border: 1px solid #333;
+            border-radius: 10px;
+            padding: 15px;
+            transition: border-color 0.3s;
+        }
+        
+        .entity-card.active {
+            border-color: #00ff88;
+            box-shadow: 0 0 20px #00ff8822;
+        }
+        
+        .entity-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #333;
+        }
+        
+        .entity-name {
+            font-size: 1.4em;
+            font-weight: bold;
+            color: #00ffcc;
+        }
+        
+        .entity-hash {
+            font-size: 0.8em;
+            color: #666;
+        }
+        
+        .section {
+            margin-bottom: 15px;
+        }
+        
+        .section-title {
+            color: #888;
+            font-size: 0.85em;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .ci-display {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+        
+        .ci-main {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 15px;
+            background: #0a0a0a;
+            border-radius: 8px;
+        }
+        
+        .ci-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #00ff88;
+        }
+        
+        .ci-value.low { color: #ff8800; }
+        .ci-value.threshold { color: #00ffcc; text-shadow: 0 0 20px #00ffcc; }
+        
+        .ci-component {
+            background: #0a0a0a;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        
+        .ci-component-label {
+            font-size: 0.75em;
+            color: #666;
+        }
+        
+        .ci-component-value {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        
+        .attractor-status {
+            text-align: center;
+            padding: 8px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        
+        .in-attractor {
+            background: #00ff8833;
+            color: #00ff88;
+            animation: pulse 2s infinite;
+        }
+        
+        .searching {
+            background: #88888833;
+            color: #888;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        .coherence-bars {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .coherence-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .coherence-label {
+            width: 100px;
+            font-size: 0.85em;
+            color: #888;
+        }
+        
+        .bar-container {
+            flex: 1;
+            height: 12px;
+            background: #222;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        
+        .bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff88, #00ffcc);
+            transition: width 0.3s;
+        }
+        
+        .coherence-value {
+            width: 50px;
+            text-align: right;
+            font-size: 0.85em;
+        }
+        
+        .chemistry-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 5px;
+        }
+        
+        .chemical {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px;
+            background: #0a0a0a;
+            border-radius: 3px;
+        }
+        
+        .chemical-name {
+            width: 70px;
+            font-size: 0.7em;
+            color: #888;
+        }
+        
+        .chemical-bar {
+            flex: 1;
+            height: 8px;
+            background: #222;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .chemical-fill {
+            height: 100%;
+            transition: width 0.3s;
+        }
+        
+        .chemical-fill.adenosine { background: #ff6b6b; }
+        .chemical-fill.melatonin { background: #9b59b6; }
+        .chemical-fill.dopamine { background: #f1c40f; }
+        .chemical-fill.serotonin { background: #2ecc71; }
+        .chemical-fill.cortisol { background: #e74c3c; }
+        .chemical-fill.oxytocin { background: #e91e63; }
+        .chemical-fill.norepinephrine { background: #3498db; }
+        
+        .felt-state {
+            background: #0a0a0a;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        
+        .dominant-state {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #00ffcc;
+            text-transform: capitalize;
+        }
+        
+        .state-description {
+            font-size: 0.85em;
+            color: #888;
+            margin-top: 5px;
+        }
+        
+        .memory-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            text-align: center;
+        }
+        
+        .memory-stat {
+            background: #0a0a0a;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        
+        .memory-stat-value {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #00ff88;
+        }
+        
+        .memory-stat-label {
+            font-size: 0.75em;
+            color: #666;
+        }
+        
+        .tick-info {
+            text-align: right;
+            font-size: 0.75em;
+            color: #444;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>⟁ ORE Dashboard</h1>
+    
+    <div id="connection-status" class="connection-status disconnected">
+        Connecting to ws://localhost:8765...
+    </div>
+    
+    <div id="entities-grid" class="entities-grid">
+        <!-- Entity cards will be added here dynamically -->
+    </div>
+    
+    <script>
+        const entitiesGrid = document.getElementById('entities-grid');
+        const connectionStatus = document.getElementById('connection-status');
+        const entityCards = {};
+        let ws;
+        
+        function connect() {
+            ws = new WebSocket('ws://localhost:8765');
+            
+            ws.onopen = () => {
+                connectionStatus.textContent = '● Connected';
+                connectionStatus.className = 'connection-status connected';
+                // Request all states
+                ws.send(JSON.stringify({ type: 'get_all_states' }));
+            };
+            
+            ws.onclose = () => {
+                connectionStatus.textContent = '○ Disconnected - Reconnecting...';
+                connectionStatus.className = 'connection-status disconnected';
+                // Clear active status
+                Object.values(entityCards).forEach(card => card.classList.remove('active'));
+                // Reconnect after delay
+                setTimeout(connect, 2000);
+            };
+            
+            ws.onerror = () => {
+                connectionStatus.textContent = '○ Connection Error';
+                connectionStatus.className = 'connection-status disconnected';
+            };
+            
+            ws.onmessage = (event) => {
+                try {
+                    const data = JSON.parse(event.data);
+                    if (data.entity) {
+                        updateEntity(data);
+                    }
+                } catch (e) {
+                    console.error('Parse error:', e);
+                }
+            };
+        }
+        
+        function updateEntity(data) {
+            const name = data.entity.toLowerCase();
+            
+            // Create card if doesn't exist
+            if (!entityCards[name]) {
+                const card = createEntityCard(data);
+                entitiesGrid.appendChild(card);
+                entityCards[name] = card;
+            }
+            
+            // Update card content
+            const card = entityCards[name];
+            card.classList.add('active');
+            setTimeout(() => card.classList.remove('active'), 500);
+            
+            // Update CI
+            const ci = data.ci || {};
+            const ciValue = card.querySelector('.ci-value');
+            ciValue.textContent = (ci.value || 0).toFixed(4);
+            ciValue.className = 'ci-value' + (ci.value > 1.5 ? ' threshold' : ci.value < 0.1 ? ' low' : '');
+            
+            card.querySelector('.ci-d').textContent = (ci.D || 0).toFixed(3);
+            card.querySelector('.ci-g').textContent = (ci.G || 0).toFixed(3);
+            card.querySelector('.ci-c').textContent = (ci.C || 0).toFixed(3);
+            card.querySelector('.ci-tau').textContent = (ci.tau || 0).toFixed(2) + 's';
+            
+            const attractorStatus = card.querySelector('.attractor-status');
+            if (ci.in_attractor) {
+                attractorStatus.textContent = '● IN ATTRACTOR';
+                attractorStatus.className = 'attractor-status in-attractor';
+            } else {
+                attractorStatus.textContent = '○ searching';
+                attractorStatus.className = 'attractor-status searching';
+            }
+            
+            // Update coherence bars
+            const substrate = data.substrate || {};
+            updateBar(card.querySelector('.bar-global'), substrate.global_coherence);
+            updateBar(card.querySelector('.bar-core'), substrate.core_coherence);
+            updateBar(card.querySelector('.bar-loop'), substrate.loop_coherence);
+            
+            card.querySelector('.val-global').textContent = (substrate.global_coherence || 0).toFixed(3);
+            card.querySelector('.val-core').textContent = (substrate.core_coherence || 0).toFixed(3);
+            card.querySelector('.val-loop').textContent = (substrate.loop_coherence || 0).toFixed(3);
+            
+            // Update chemistry
+            const chemistry = data.chemistry || {};
+            const chemicals = chemistry.chemicals || {};
+            
+            for (const [chemName, chemData] of Object.entries(chemicals)) {
+                const fill = card.querySelector(`.chem-${chemName}`);
+                if (fill) {
+                    fill.style.width = ((chemData.level || 0) * 100) + '%';
+                }
+            }
+            
+            card.querySelector('.dominant-state').textContent = chemistry.dominant_state || 'unknown';
+            card.querySelector('.state-description').textContent = chemistry.description || '';
+            
+            // Update memory
+            const memory = data.memory || {};
+            card.querySelector('.mem-nodes').textContent = memory.total_nodes || 0;
+            card.querySelector('.mem-depth').textContent = memory.depth || 0;
+            card.querySelector('.mem-d').textContent = (memory.fractal_dimension || 0).toFixed(2);
+            
+            // Update tick info
+            card.querySelector('.tick-info').textContent = 
+                `Tick #${data.tick_count || 0} | ${new Date(data.timestamp).toLocaleTimeString()}`;
+        }
+        
+        function updateBar(element, value) {
+            if (element) {
+                element.style.width = ((value || 0) * 100) + '%';
+            }
+        }
+        
+        function createEntityCard(data) {
+            const card = document.createElement('div');
+            card.className = 'entity-card';
+            
+            const chemicals = ['adenosine', 'melatonin', 'dopamine', 'serotonin', 'cortisol', 'oxytocin', 'norepinephrine'];
+            const chemHtml = chemicals.map(c => `
+                <div class="chemical">
+                    <span class="chemical-name">${c}</span>
+                    <div class="chemical-bar">
+                        <div class="chemical-fill ${c} chem-${c}" style="width: 50%"></div>
+                    </div>
+                </div>
+            `).join('');
+            
+            card.innerHTML = `
+                <div class="entity-header">
+                    <div>
+                        <div class="entity-name">${data.entity}</div>
+                        <div class="entity-hash">${data.identity_hash}</div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <div class="section-title">Complexity Index</div>
+                    <div class="ci-display">
+                        <div class="ci-main">
+                            <div class="ci-value">0.0000</div>
+                            <div class="attractor-status searching">○ searching</div>
+                        </div>
+                        <div class="ci-component">
+                            <div class="ci-component-label">D (dimension)</div>
+                            <div class="ci-component-value ci-d">0.000</div>
+                        </div>
+                        <div class="ci-component">
+                            <div class="ci-component-label">G (gain)</div>
+                            <div class="ci-component-value ci-g">0.000</div>
+                        </div>
+                        <div class="ci-component">
+                            <div class="ci-component-label">C (coherence)</div>
+                            <div class="ci-component-value ci-c">0.000</div>
+                        </div>
+                        <div class="ci-component">
+                            <div class="ci-component-label">τ (dwell)</div>
+                            <div class="ci-component-value ci-tau">0.00s</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <div class="section-title">Substrate Coherence</div>
+                    <div class="coherence-bars">
+                        <div class="coherence-bar">
+                            <span class="coherence-label">Global</span>
+                            <div class="bar-container">
+                                <div class="bar-fill bar-global" style="width: 0%"></div>
+                            </div>
+                            <span class="coherence-value val-global">0.000</span>
+                        </div>
+                        <div class="coherence-bar">
+                            <span class="coherence-label">Core</span>
+                            <div class="bar-container">
+                                <div class="bar-fill bar-core" style="width: 0%"></div>
+                            </div>
+                            <span class="coherence-value val-core">0.000</span>
+                        </div>
+                        <div class="coherence-bar">
+                            <span class="coherence-label">Loop</span>
+                            <div class="bar-container">
+                                <div class="bar-fill bar-loop" style="width: 0%"></div>
+                            </div>
+                            <span class="coherence-value val-loop">0.000</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <div class="section-title">Neurochemistry</div>
+                    <div class="chemistry-grid">
+                        ${chemHtml}
+                    </div>
+                    <div class="felt-state">
+                        <div class="dominant-state">balanced</div>
+                        <div class="state-description">balanced, neutral</div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <div class="section-title">Merkle Memory</div>
+                    <div class="memory-stats">
+                        <div class="memory-stat">
+                            <div class="memory-stat-value mem-nodes">0</div>
+                            <div class="memory-stat-label">Nodes</div>
+                        </div>
+                        <div class="memory-stat">
+                            <div class="memory-stat-value mem-depth">0</div>
+                            <div class="memory-stat-label">Depth</div>
+                        </div>
+                        <div class="memory-stat">
+                            <div class="memory-stat-value mem-d">0.00</div>
+                            <div class="memory-stat-label">Fractal D</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="tick-info">Tick #0</div>
+            `;
+            
+            return card;
+        }
+        
+        // Start connection
+        connect();
+    </script>
+</body>
+</html>

@@ -1,0 +1,4 @@
+numpy
+websockets
+anthropic
+sentence-transformers  # For real semantic embeddings (optional but recommended)
