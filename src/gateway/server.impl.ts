@@ -1,4 +1,5 @@
 import { resolveAgentWorkspaceDir, resolveDefaultAgentId } from "../agents/agent-scope.js";
+import { startSidecar, stopSidecar } from "../substrate/sidecar.js";
 import { initSubagentRegistry } from "../agents/subagent-registry.js";
 import { registerSkillsChangeListener } from "../agents/skills/refresh.js";
 import type { CanvasHostServer } from "../canvas-host/server.js";
@@ -216,6 +217,17 @@ export async function startGatewayServer(
   }
   setGatewaySigusr1RestartPolicy({ allowExternal: cfgAtStart.commands?.restart === true });
   initSubagentRegistry();
+
+  // ── ORE Substrate Sidecar ─────────────────────────────────────
+  // Start the Python sidecar if any agent has substrate enabled.
+  const hasSubstrateAgents = cfgAtStart.agents?.list?.some((a) => a?.substrate?.enabled);
+  if (hasSubstrateAgents) {
+    startSidecar({ log: (msg: unknown) => log.info(String(msg)) }).catch((err) => {
+      log.warn(`ORE substrate sidecar failed to start: ${err}`);
+    });
+  }
+  // ──────────────────────────────────────────────────────────────
+
   const defaultAgentId = resolveDefaultAgentId(cfgAtStart);
   const defaultWorkspaceDir = resolveAgentWorkspaceDir(cfgAtStart, defaultAgentId);
   const baseMethods = listGatewayMethods();
@@ -580,6 +592,7 @@ export async function startGatewayServer(
         skillsRefreshTimer = null;
       }
       skillsChangeUnsub();
+      stopSidecar();
       await close(opts);
     },
   };

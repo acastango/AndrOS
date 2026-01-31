@@ -23,7 +23,7 @@ import { resolveUserPath } from "../../../utils.js";
 import { createCacheTrace } from "../../cache-trace.js";
 import { createAnthropicPayloadLogger } from "../../anthropic-payload-log.js";
 import { resolveOpenClawAgentDir } from "../../agent-paths.js";
-import { resolveSessionAgentIds } from "../../agent-scope.js";
+import { resolveAgentConfig, resolveSessionAgentIds } from "../../agent-scope.js";
 import { makeBootstrapWarn, resolveBootstrapContextForRun } from "../../bootstrap-files.js";
 import { resolveOpenClawDocsPath } from "../../docs-path.js";
 import { resolveModelAuthMode } from "../../model-auth.js";
@@ -85,6 +85,7 @@ import { getGlobalHookRunner } from "../../../plugins/hook-runner-global.js";
 import { MAX_IMAGE_BYTES } from "../../../media/constants.js";
 import type { EmbeddedRunAttemptParams, EmbeddedRunAttemptResult } from "./types.js";
 import { detectAndLoadPromptImages } from "./images.js";
+import { beforeAgentRun, afterAgentRun, type SubstrateRunContext } from "../../../substrate/agent-substrate.js";
 
 export function injectHistoryImagesIntoMessages(
   messages: AgentMessage[],
@@ -334,11 +335,33 @@ export async function runEmbeddedAttempt(
     });
     const ttsHint = params.config ? buildTtsSystemPromptHint(params.config) : undefined;
 
+    // ── Substrate: initialize and get prompt context ──────────────
+    let substrateCtx: SubstrateRunContext | null = null;
+    let substratePrompt: string | undefined;
+    const agentCfg = params.config ? resolveAgentConfig(params.config, sessionAgentId) : undefined;
+    if (agentCfg?.substrate?.enabled) {
+      try {
+        substrateCtx = await beforeAgentRun(sessionAgentId, agentCfg.substrate);
+        if (substrateCtx?.promptContext) {
+          substratePrompt = substrateCtx.promptContext;
+        }
+      } catch (err) {
+        log.warn(`substrate init failed (non-blocking): ${err}`);
+      }
+    }
+    // Combine substrate context with any existing extraSystemPrompt
+    const combinedExtraPrompt = substratePrompt
+      ? params.extraSystemPrompt
+        ? `${substratePrompt}\n\n${params.extraSystemPrompt}`
+        : substratePrompt
+      : params.extraSystemPrompt;
+    // ─────────────────────────────────────────────────────────────
+
     const appendPrompt = buildEmbeddedSystemPrompt({
       workspaceDir: effectiveWorkspace,
       defaultThinkLevel: params.thinkLevel,
       reasoningLevel: params.reasoningLevel ?? "off",
-      extraSystemPrompt: params.extraSystemPrompt,
+      extraSystemPrompt: combinedExtraPrompt,
       ownerNumbers: params.ownerNumbers,
       reasoningTagHint,
       heartbeatPrompt: isDefaultAgent
@@ -838,6 +861,15 @@ export async function runEmbeddedAttempt(
         clearActiveEmbeddedRun(params.sessionId, queueHandle);
         params.abortSignal?.removeEventListener?.("abort", onAbort);
       }
+
+      // ── Substrate: process response for commands ──────────────
+      if (substrateCtx?.initialized && assistantTexts.length > 0) {
+        const fullResponse = assistantTexts.join("\n");
+        afterAgentRun(substrateCtx, fullResponse).catch((err) => {
+          log.warn(`substrate post-process failed (non-blocking): ${err}`);
+        });
+      }
+      // ─────────────────────────────────────────────────────────
 
       const lastAssistant = messagesSnapshot
         .slice()

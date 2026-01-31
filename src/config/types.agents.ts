@@ -7,6 +7,7 @@ import type {
   SandboxPruneSettings,
 } from "./types.sandbox.js";
 import type { AgentToolsConfig, MemorySearchConfig } from "./types.tools.js";
+import type { SubstrateAgentConfig } from "../substrate/types.js";
 
 export type AgentModelConfig =
   | string
@@ -60,6 +61,8 @@ export type AgentConfig = {
     prune?: SandboxPruneSettings;
   };
   tools?: AgentToolsConfig;
+  /** ORE substrate configuration. When enabled, the agent operates within an oscillatory resonance substrate. */
+  substrate?: SubstrateAgentConfig;
 };
 
 export type AgentsConfig = {
