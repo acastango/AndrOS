@@ -145,7 +145,7 @@ export function resolveAgentWorkspaceDir(cfg: OpenClawConfig, agentId: string) {
     if (fallback) return resolveUserPath(fallback);
     return DEFAULT_AGENT_WORKSPACE_DIR;
   }
-  return path.join(os.homedir(), ".openclaw", `workspace-${id}`);
+  return path.join(os.homedir(), ".andros", `workspace-${id}`);
 }
 
 export function resolveAgentDir(cfg: OpenClawConfig, agentId: string) {

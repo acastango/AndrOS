@@ -113,11 +113,11 @@ export function buildSandboxCreateArgs(params: {
 }) {
   const createdAtMs = params.createdAtMs ?? Date.now();
   const args = ["create", "--name", params.name];
-  args.push("--label", "openclaw.sandbox=1");
-  args.push("--label", `openclaw.sessionKey=${params.scopeKey}`);
-  args.push("--label", `openclaw.createdAtMs=${createdAtMs}`);
+  args.push("--label", "andros.sandbox=1");
+  args.push("--label", `andros.sessionKey=${params.scopeKey}`);
+  args.push("--label", `andros.createdAtMs=${createdAtMs}`);
   if (params.configHash) {
-    args.push("--label", `openclaw.configHash=${params.configHash}`);
+    args.push("--label", `andros.configHash=${params.configHash}`);
   }
   for (const [key, value] of Object.entries(params.labels ?? {})) {
     if (key && value) args.push("--label", `${key}=${value}`);
@@ -218,7 +218,7 @@ async function readContainerConfigHash(containerName: string): Promise<string | 
     if (!raw || raw === "<no value>") return null;
     return raw;
   };
-  return await readLabel("openclaw.configHash");
+  return await readLabel("andros.configHash");
 }
 
 function formatSandboxRecreateHint(params: { scope: SandboxConfig["scope"]; sessionKey: string }) {

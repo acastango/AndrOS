@@ -1,4 +1,4 @@
-import { resolveOpenClawPackageRoot } from "../../infra/openclaw-root.js";
+import { resolveOpenClawPackageRoot } from "../../infra/andros-root.js";
 import { scheduleGatewaySigusr1Restart } from "../../infra/restart.js";
 import {
   formatDoctorNonInteractiveHint,

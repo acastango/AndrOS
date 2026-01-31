@@ -150,6 +150,7 @@ export async function startGatewayServer(
   opts: GatewayServerOptions = {},
 ): Promise<GatewayServer> {
   // Ensure all default port derivations (browser/canvas) see the actual runtime port.
+  process.env.ANDROS_GATEWAY_PORT = String(port);
   process.env.OPENCLAW_GATEWAY_PORT = String(port);
   logAcceptedEnvOption({
     key: "OPENCLAW_RAW_STREAM",

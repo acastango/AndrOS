@@ -57,7 +57,7 @@ function normalizeAllowlist(input: unknown): string[] | undefined {
   return normalized.length > 0 ? normalized : undefined;
 }
 
-const BUNDLED_SOURCES = new Set(["openclaw-bundled"]);
+const BUNDLED_SOURCES = new Set(["andros-bundled", "openclaw-bundled"]);
 
 function isBundledSkill(entry: SkillEntry): boolean {
   return BUNDLED_SOURCES.has(entry.skill.source);

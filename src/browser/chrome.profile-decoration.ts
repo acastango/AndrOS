@@ -7,7 +7,7 @@ import {
 } from "./constants.js";
 
 function decoratedMarkerPath(userDataDir: string) {
-  return path.join(userDataDir, ".openclaw-profile-decorated");
+  return path.join(userDataDir, ".andros-profile-decorated");
 }
 
 function safeReadJson(filePath: string): Record<string, unknown> | null {

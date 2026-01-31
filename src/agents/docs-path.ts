@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 
-import { resolveOpenClawPackageRoot } from "../infra/openclaw-root.js";
+import { resolveOpenClawPackageRoot } from "../infra/andros-root.js";
 
 export async function resolveOpenClawDocsPath(params: {
   workspaceDir?: string;

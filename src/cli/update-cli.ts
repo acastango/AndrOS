@@ -5,7 +5,7 @@ import path from "node:path";
 import type { Command } from "commander";
 
 import { readConfigFileSnapshot, writeConfigFile } from "../config/config.js";
-import { resolveOpenClawPackageRoot } from "../infra/openclaw-root.js";
+import { resolveOpenClawPackageRoot } from "../infra/andros-root.js";
 import {
   checkUpdateStatus,
   compareSemverStrings,
